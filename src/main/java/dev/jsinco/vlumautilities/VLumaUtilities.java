@@ -36,6 +36,9 @@ public class VLumaUtilities {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logger.info("VLumaUtilities has been initialized!");
 
+        SnakeYamlManager file = new SnakeYamlManager("config.yaml").generateFile();
+        file.setString("testr", "testt");
+        file.save();
 
         CommandManager commandManager = proxy.getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("echo").plugin(this).build();
