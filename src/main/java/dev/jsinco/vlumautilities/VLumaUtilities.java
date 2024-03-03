@@ -10,6 +10,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import dev.jsinco.vlumautilities.commands.EchoCommand;
+import dev.jsinco.vlumautilities.files.SnakeYamlConfig;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -36,9 +37,13 @@ public class VLumaUtilities {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logger.info("VLumaUtilities has been initialized!");
 
-        SnakeYamlManager file = new SnakeYamlManager("config.yaml").generateFile();
-        file.setString("testr", "testt");
-        file.save();
+        SnakeYamlConfig file = new SnakeYamlConfig("config.yaml").generateFile();
+        logger.info(file.getString("test.and"));
+        /*file.getConfigurationSection("test").getKeys().forEach(key -> {
+            logger.info(key + ": " + file.getObject("test." + key).getClass().getName());
+        });*/
+        //file.setString("testr", "testt");
+        //file.save();
 
         CommandManager commandManager = proxy.getCommandManager();
         CommandMeta commandMeta = commandManager.metaBuilder("echo").plugin(this).build();
