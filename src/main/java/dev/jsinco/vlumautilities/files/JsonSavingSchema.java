@@ -3,14 +3,13 @@ package dev.jsinco.vlumautilities.files;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonWriter;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.util.LinkedHashMap;
 
@@ -20,11 +19,20 @@ public class JsonSavingSchema extends AbstractFileManager {
 
 
     public JsonSavingSchema(String fileName) {
-        this(new File(dataFolder, fileName));
+        this(new File(dataFolder, fileName), false);
     }
 
-    public JsonSavingSchema(File file) {
+    public JsonSavingSchema(String fileName, boolean isImaginary) {
+        this(new File(dataFolder, fileName), isImaginary);
+    }
+
+    public JsonSavingSchema(File file, boolean isImaginary) {
         super(file);
+        if (isImaginary) {
+            loadImaginaryFile();
+        } else {
+            generateFile();
+        }
     }
 
 
@@ -34,6 +42,9 @@ public class JsonSavingSchema extends AbstractFileManager {
             try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(file.getName())) {
                 assert inputStream != null;
                 data = gson.fromJson(new String(inputStream.readAllBytes(), Charsets.UTF_8), LinkedHashMap.class);
+                if (data == null) {
+                    data = new LinkedHashMap<>();
+                }
             } catch (IOException e) {
                 logger.error("Error loading imaginary file (Gson): " + e.getMessage());
             }
@@ -46,6 +57,9 @@ public class JsonSavingSchema extends AbstractFileManager {
         if (isJson(file)) {
             try (InputStream inputStream = Files.newInputStream(file.toPath())) {
                 data = gson.fromJson(new String(inputStream.readAllBytes(), Charsets.UTF_8), LinkedHashMap.class);
+                if (data == null) {
+                    data = new LinkedHashMap<>();
+                }
             } catch (IOException e) {
                 logger.error("Error loading file (Gson): " + e.getMessage());
             }
@@ -84,9 +98,18 @@ public class JsonSavingSchema extends AbstractFileManager {
     public void save() {
         Preconditions.checkArgument(file != null, "File cannot be null");
 
-        String data = gson.toJson(this.data);
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), Charsets.UTF_8)) {
+
+
+        /*try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), Charsets.UTF_8)) {
             writer.write(data);
+        } catch (IOException e) {
+            logger.error("Error saving file (Gson): " + e.getMessage());
+        }*/
+        //String data = gson.toJson(this.data);
+        try (JsonWriter jsonWriter = new JsonWriter(new FileWriter(file))){
+            jsonWriter.setIndent("    ");
+            gson.toJson(this.data, LinkedHashMap.class, jsonWriter);
+            jsonWriter.flush();
         } catch (IOException e) {
             logger.error("Error saving file (Gson): " + e.getMessage());
         }

@@ -24,50 +24,65 @@ public class ConfigurationSection {
         return data.containsKey(key);
     }
 
-    public Object get(String key) {
-        return data.get(key);
-    }
 
-    //
     public ConfigurationSection getConfigurationSection(String key) {
+        data.computeIfAbsent(key, k -> new LinkedHashMap<String, Object>());
         return new ConfigurationSection((LinkedHashMap<String, Object>) data.get(key));
     }
 
-    private ConfigurationSection getFromLastSection(String path) {
-        String[] keys = path.split("\\.");
+    private Object getLastFromSection(String path) {
+        List<String> keys = new ArrayList<>(List.of(path.split("\\.")));
+        String lastKey = keys.remove(keys.size() - 1);
         ConfigurationSection section = this;
         for (String key : keys) {
             section = section.getConfigurationSection(key);
         }
-        return section;
+        return section.data.get(lastKey);
+    }
+
+    private void setLastInSection(String path, Object value) {
+        List<String> keys = new ArrayList<>(List.of(path.split("\\.")));
+        String lastKey = keys.remove(keys.size() - 1);
+        ConfigurationSection section = this;
+        for (String key : keys) {
+            section = section.getConfigurationSection(key);
+        }
+        section.data.put(lastKey, value);
     }
 
 
     public String getString(String path) {
-        return (String) getFromLastSection(path).get(path);
+        return (String) getLastFromSection(path);
     }
+
     public int getInt(String path) {
-        //return (int) getSection(path).get(path);
-        return 0;
+        return (int) getLastFromSection(path);
     }
+
     public boolean getBoolean(String path) {
-        return (boolean) data.get(path);
+        return (boolean) getLastFromSection(path);
     }
+
     public double getDouble(String path) {
-        return (double) data.get(path);
+        return (double) getLastFromSection(path);
     }
+
     public long getLong(String path) {
-        return (long) data.get(path);
+        return (long) getLastFromSection(path);
     }
+
     public float getFloat(String path) {
-        return (float) data.get(path);
+        return (float) getLastFromSection(path);
     }
+
     public byte getByte(String path) {
-        return (byte) data.get(path);
+        return (byte) getLastFromSection(path);
     }
+
     public short getShort(String path) {
-        return (short) data.get(path);
+        return (short) getLastFromSection(path);
     }
+
     // TODO: Lists, configuration sections
     public List<String> getStringList(String path) {
         if (data.get(path) instanceof List<?>) {
@@ -75,35 +90,12 @@ public class ConfigurationSection {
         }
         return Collections.emptyList();
     }
-    public Object getObject(String path) {
-        return data.get(path);
+
+    public Object get(String path) {
+        return getLastFromSection(path);
     }
 
-    public void setString(String path, String value) {
-        data.put(path, value);
-    }
-    public void setInt(String path, int value) {
-        data.put(path, value);
-    }
-    public void setBoolean(String path, boolean value) {
-        data.put(path, value);
-    }
-    public void setDouble(String path, double value) {
-        data.put(path, value);
-    }
-    public void setLong(String path, long value) {
-        data.put(path, value);
-    }
-    public void setFloat(String path, float value) {
-        data.put(path, value);
-    }
-    public void setByte(String path, byte value) {
-        data.put(path, value);
-    }
-    public void setShort(String path, short value) {
-        data.put(path, value);
-    }
-    public void setObject(String path, Object value) {
-        data.put(path, value);
+    public void set(String path, Object value) {
+        setLastInSection(path, value);
     }
 }

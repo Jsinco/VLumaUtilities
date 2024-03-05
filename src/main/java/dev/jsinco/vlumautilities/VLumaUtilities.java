@@ -3,13 +3,14 @@ package dev.jsinco.vlumautilities;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
-import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import dev.jsinco.vlumautilities.commands.EchoCommand;
+import dev.jsinco.vlumautilities.files.JsonSavingSchema;
 import dev.jsinco.vlumautilities.files.SnakeYamlConfig;
 import org.slf4j.Logger;
 
@@ -37,8 +38,13 @@ public class VLumaUtilities {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logger.info("VLumaUtilities has been initialized!");
 
-        SnakeYamlConfig file = new SnakeYamlConfig("config.yaml").generateFile();
-        logger.info(file.getString("test.and"));
+        //SnakeYamlConfig file = new SnakeYamlConfig("config.yaml");
+        JsonSavingSchema file = new JsonSavingSchema("saves.json");
+        file.set("tester.testingtwo", 3);
+        file.save();
+        SnakeYamlConfig yamlConfig = new SnakeYamlConfig("testing.yml");
+        yamlConfig.set("test", "test");
+        yamlConfig.save();
         /*file.getConfigurationSection("test").getKeys().forEach(key -> {
             logger.info(key + ": " + file.getObject("test." + key).getClass().getName());
         });*/

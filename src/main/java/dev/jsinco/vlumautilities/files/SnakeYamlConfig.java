@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.util.LinkedHashMap;
 
 public class SnakeYamlConfig extends AbstractFileManager {
 
@@ -25,15 +26,24 @@ public class SnakeYamlConfig extends AbstractFileManager {
         options.setWidth(80);
         options.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
     }
-    private final static Yaml yaml = new Yaml(options);
+    private final Yaml yaml = new Yaml(options);
 
 
     public SnakeYamlConfig(String fileName) {
-        this(new File(dataFolder, fileName));
+        this(new File(dataFolder, fileName), false);
     }
 
-    public SnakeYamlConfig(File file) {
+    public SnakeYamlConfig(String fileName, boolean isImaginary) {
+        this(new File(dataFolder, fileName), isImaginary);
+    }
+
+    public SnakeYamlConfig(File file, boolean isImaginary) {
         super(file);
+        if (isImaginary) {
+            loadImaginaryFile();
+        } else {
+            generateFile();
+        }
     }
 
     @Override
@@ -41,6 +51,9 @@ public class SnakeYamlConfig extends AbstractFileManager {
         if (isYaml(file)) {
             try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(file.getName())) {
                 data = yaml.load(inputStream);
+                if (data == null) {
+                    data = new LinkedHashMap<>();
+                }
             } catch (IOException e) {
                 logger.error("Error loading imaginary file: " + e.getMessage());
             }
@@ -53,6 +66,9 @@ public class SnakeYamlConfig extends AbstractFileManager {
         if (isYaml(file)) {
             try (InputStream inputStream = Files.newInputStream(file.toPath())) {
                 data = yaml.load(inputStream);
+                if (data == null) {
+                    data = new LinkedHashMap<>();
+                }
             } catch (IOException e) {
                 logger.error("Error loading file: " + e.getMessage());
             }
