@@ -1,4 +1,4 @@
-package dev.jsinco.vlumautilities.files;
+package dev.jsinco.vlumautilities.filemanagers;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -98,14 +98,6 @@ public class JsonSavingSchema extends AbstractFileManager {
     public void save() {
         Preconditions.checkArgument(file != null, "File cannot be null");
 
-
-
-        /*try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), Charsets.UTF_8)) {
-            writer.write(data);
-        } catch (IOException e) {
-            logger.error("Error saving file (Gson): " + e.getMessage());
-        }*/
-        //String data = gson.toJson(this.data);
         try (JsonWriter jsonWriter = new JsonWriter(new FileWriter(file))){
             jsonWriter.setIndent("    ");
             gson.toJson(this.data, LinkedHashMap.class, jsonWriter);

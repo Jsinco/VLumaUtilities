@@ -1,4 +1,4 @@
-package dev.jsinco.vlumautilities.files;
+package dev.jsinco.vlumautilities.filemanagers;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;

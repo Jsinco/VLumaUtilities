@@ -1,4 +1,4 @@
-package dev.jsinco.vlumautilities.files;
+package dev.jsinco.vlumautilities.filemanagers;
 
 import dev.jsinco.vlumautilities.VLumaUtilities;
 import org.jetbrains.annotations.Nullable;

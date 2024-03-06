@@ -1,18 +1,24 @@
-package dev.jsinco.vlumautilities.files;
+package dev.jsinco.vlumautilities.filemanagers;
 
+import com.google.gson.internal.LinkedTreeMap;
+import dev.jsinco.vlumautilities.VLumaUtilities;
+
+import java.util.AbstractList;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+@SuppressWarnings({"unchecked", "unused"})
 public class ConfigurationSection {
 
-    protected LinkedHashMap<String, Object> data;
+    protected AbstractMap<String, Object> data;
 
     public ConfigurationSection() {
     }
 
-    public ConfigurationSection(LinkedHashMap<String, Object> data) {
+    public ConfigurationSection(AbstractMap<String, Object> data) {
         this.data = data;
     }
 
@@ -27,7 +33,14 @@ public class ConfigurationSection {
 
     public ConfigurationSection getConfigurationSection(String key) {
         data.computeIfAbsent(key, k -> new LinkedHashMap<String, Object>());
-        return new ConfigurationSection((LinkedHashMap<String, Object>) data.get(key));
+        if (data.get(key) instanceof LinkedHashMap<?, ?>) {
+            return new ConfigurationSection((LinkedHashMap<String, Object>) data.get(key));
+        } else if (data.get(key) instanceof LinkedTreeMap<?, ?>) {
+            return new ConfigurationSection((LinkedTreeMap<String, Object>) data.get(key));
+        } else {
+            VLumaUtilities.getLogger().error("Unknown map type: " + data.get(key).getClass().getName());
+        }
+        return new ConfigurationSection((AbstractMap<String, Object>) data.get(key));
     }
 
     private Object getLastFromSection(String path) {
@@ -83,10 +96,28 @@ public class ConfigurationSection {
         return (short) getLastFromSection(path);
     }
 
-    // TODO: Lists, configuration sections
+
     public List<String> getStringList(String path) {
-        if (data.get(path) instanceof List<?>) {
-            return (List<String>) data.get(path);
+        if (data.get(path) instanceof AbstractList<?>) {
+            return (AbstractList<String>) data.get(path);
+        }
+        return Collections.emptyList();
+    }
+    public List<Integer> getIntList(String path) {
+        if (data.get(path) instanceof AbstractList<?>) {
+            return (AbstractList<Integer>) data.get(path);
+        }
+        return Collections.emptyList();
+    }
+    public List<Double> getDoubleList(String path) {
+        if (data.get(path) instanceof AbstractList<?>) {
+            return (AbstractList<Double>) data.get(path);
+        }
+        return Collections.emptyList();
+    }
+    public List<Object> getObjectList(String path) {
+        if (data.get(path) instanceof AbstractList<?>) {
+            return (AbstractList<Object>) data.get(path);
         }
         return Collections.emptyList();
     }
@@ -97,5 +128,9 @@ public class ConfigurationSection {
 
     public void set(String path, Object value) {
         setLastInSection(path, value);
+    }
+
+    public void remove(String path) {
+        setLastInSection(path, null);
     }
 }
