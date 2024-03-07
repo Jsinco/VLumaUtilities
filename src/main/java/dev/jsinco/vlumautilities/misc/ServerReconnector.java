@@ -72,8 +72,6 @@ public class ServerReconnector {
         }).repeat(1, TimeUnit.MINUTES).schedule();
 
         sendCache.put(server, new ReconnectingServer(new ArrayList<>(), task));
-
-
     }
 
     private static class ReconnectingServer {
